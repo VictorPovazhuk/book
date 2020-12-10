@@ -62,13 +62,14 @@ def read_first_lines(file_name: str, rows_number: int):
     print()
 
 def main():
-    directory = './DATA/cinema/'
+    # directory = './DATA/cinema/'
     # files = [os.path.join(directory, short_name)
     #         for short_name in os.listdir(directory)]
     # for f_name in files:
     #     read_first_lines(f_name, 5)
     person = 'nm0126406'
     title_ids = find_person_films(person)
+    pprint(title_ids)
     infos = find_films_info(title_ids)
     pprint(infos)
 
