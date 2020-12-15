@@ -1,4 +1,4 @@
-"""Compare reviews for film and book"""
+"""Compare reviews for films and book"""
 
 import time
 from pprint import pprint
@@ -78,16 +78,53 @@ def main():
     pprint(film_rates)
 
 
-def test():
+def test_film():
     book_name = 'Don Juan'
     writer = 'nm0126406'
     person_titles_ids = ['tt0016804', 'tt3213496', 'tt0003795']
     t_ids = ['tt0016804', 'tt3213496']
-    rates = {'tt0016804': (7.0, 739)}
+    f_rates = {'tt0016804': (7.0, 739)}
+
+
+def get_book_rating(title):
+    with open('DATA/library/goodbooks_10k/books.csv') as f:
+        i = 0
+        for line in iter(f.readline, ''):
+            
+            info = line.strip().split(',')
+            if i < 3:
+                for n in range(len(info)): print(str(n) + str(info[n]))
+            i += 1
+            if (title in info[10]):  # and (info[0] in cp_person_ids): # f'"{title}"'
+                return float(info[12]), int(info[13])
+                # books.append(info[0])
+    return None
+
+# missed the decription file 'under my nose' -> should be attentive
+# check if book with similar title exsts at all
+
+
+# def get_book_id(title, author):
+#     books = []
+#     with open('DATA/library/bnb/titles.csv') as f:
+#         for line in iter(f.readline, ''):
+#             info = [piece.strip('"') for piece in line.strip().split(',')]
+#             if (title in info[0]):  # and (info[0] in cp_person_ids):
+#                 books.append(info[0])
+#     return books
+
+
+def test_book():
+    book_name = 'The Hunger Games (The Hunger Games, #1)'
+    author = 'Lord Byron'
+    # book_id = get_book_id(book_name, author)
+    # print(book_id)
+    rate = get_book_rating(book_name)
+    print(rate)
 
 
 if __name__ == '__main__':
     start = time.time()
-    # test()
-    main()
+    test_book()
+    # main()
     print(time.time() - start)
