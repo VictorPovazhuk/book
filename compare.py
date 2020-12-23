@@ -2,6 +2,8 @@
 
 import time
 from pprint import pprint
+import pandas as pd
+import csv
 
 
 def get_title_ratings(title_ids):
@@ -14,17 +16,6 @@ def get_title_ratings(title_ids):
                 rates[info[0]] = (float(info[1]), int(info[2]))
                 cp_ids.remove(info[0])
     return rates
-
-# def get_film_ratings(title_ids):
-#     infos = []
-#     cp_ids = title_ids.copy()
-#     with open('DATA/cinema/title.ratings.tsv') as f:
-#         for line in iter(f.readline, ''):
-#             info = line.strip().split('\t')
-#             if (info[0] in cp_ids):
-#                 infos.append(info)
-#                 cp_ids.remove(info[0])
-#     return infos
 
 # is each film that has appropriate title based on the book ? ->
 # need to know author of the book to find appropriate film
@@ -53,10 +44,6 @@ def get_person_titles_ids(writer):
     return ids
 
 
-def get_author(title):
-    return 'Lord Byron'
-
-
 def get_film_writer(author):
     with open('DATA/cinema/name.basics.tsv') as f:
         for line in iter(f.readline, ''):
@@ -67,7 +54,7 @@ def get_film_writer(author):
 
 def main():
     book_name = 'Don Juan'
-    author = get_author(book_name)
+    author = 'Lord Byron'
     writer = get_film_writer(author)
     print(writer)
     person_titles_ids = get_person_titles_ids(writer)
@@ -90,15 +77,40 @@ def get_book_rating(title):
     with open('DATA/library/goodbooks_10k/books.csv') as f:
         i = 0
         for line in iter(f.readline, ''):
-            
             info = line.strip().split(',')
             if i < 3:
-                for n in range(len(info)): print(str(n) + str(info[n]))
+                for n in range(len(info)):
+                    print(str(n) + str(info[n]))
             i += 1
-            if (title in info[10]):  # and (info[0] in cp_person_ids): # f'"{title}"'
+            # and (info[0] in cp_person_ids): # f'"{title}"'
+            if (title in info[10]):
                 return float(info[12]), int(info[13])
                 # books.append(info[0])
     return None
+
+def get_book_rating_1():
+    df = pd.read_csv('DATA/library/goodbooks_10k/books.csv')
+    pprint(list(df.title[df['average_rating'] > 4.7]))
+
+# def get_book_rating_2():
+#     with open('DATA/library/goodbooks_10k/books.csv') as csv_file:
+#         csv_reader = csv.reader(csv_file, delimiter=',')
+#         line_count = 0
+#         for row in csv_reader:
+#             if line_count == 0:
+#             #     # print(f'Column names are {", ".join(row)}')
+#             #     # pprint(list(enumerate(row)))
+#                 line_count += 1
+#             # else:
+#                 # print(f'\t{", ".join(row)}')
+#             elif float(row[12]) > 4.7:
+#                 # print(row[10], row[12])
+#                 0
+#             line_count += 1
+#             # if line_count > 2:
+#             #     break
+#         # print(f'Processed {line_count} lines.')
+
 
 # missed the decription file 'under my nose' -> should be attentive
 # check if book with similar title exsts at all
@@ -119,12 +131,15 @@ def test_book():
     author = 'Lord Byron'
     # book_id = get_book_id(book_name, author)
     # print(book_id)
-    rate = get_book_rating(book_name)
-    print(rate)
+    # rate = get_book_rating(book_name)
+    # print(rate)
+    get_book_rating_2()
 
 
 if __name__ == '__main__':
     start = time.time()
-    test_book()
-    # main()
+    get_book_rating_1()
+    print(time.time() - start)
+    start = time.time()
+    get_book_rating_2()
     print(time.time() - start)
