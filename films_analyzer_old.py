@@ -2,27 +2,6 @@ import time
 import os
 from pprint import pprint
 
-# def get_file_lines(file_name):
-#     with open(file_name) as f:
-#         line = f.readline()
-#         while line != '':
-#             yield line
-#             line = f.readline()
-
-# lines = []
-# with open('DATA/cinema/name.basics.tsv') as f:
-#     for i in range(3):
-#         lines.append(f.readline())
-# print(lines)
-# def find_lines_2():
-#     reader = iter(get_file_lines('DATA/cinema/name.basics.tsv'))
-#     for i in reader:
-#         person = i.strip().split('\t')
-#         # print(next(reader).strip().split('\t'))
-#         if person[1] == 'Lord Byron':
-#             print(person)
-
-# faster
 def find_person():
     with open('DATA/cinema/name.basics.tsv') as f:
         for line in iter(f.readline, ''):

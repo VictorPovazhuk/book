@@ -4,3 +4,4 @@ aDATA/**
 EXAMPLES/**
 temp
 .ipynb_checkpoints/**
+__pycache__/**

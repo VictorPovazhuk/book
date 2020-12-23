@@ -1,101 +1,56 @@
-"""Compare reviews for films and book"""
+"""Compare ratings for film and book"""
 
 import time
 from pprint import pprint
-import pandas as pd
-import csv
-
-# def get_few_titles():
-#     with open('DATA/cinema/title.basics.tsv') as f:
-#         titles = []
-#         for i in range(10):
-#             titles.append(f.readline())
-#     return titles
+import films_reader
+import books_reader
 
 
-def get_title_rating(tconst):
-    with open('DATA/cinema/title.ratings.tsv') as f:
-        for line in f:
-            info = line.strip().split('\t')
-            if (info[0] == tconst):
-                return (float(info[1]), int(info[2]))
-    return None
-
-
-def get_title_writer(tconst):
-    with open('DATA/cinema/title.principals.tsv') as f:
-        for line in f:
-            info = line.strip().split('\t')
-            if info[0] == tconst and info[3] == 'writer':  # 'Don Juan' in info[4] and #
-                return info
-    return None
-
-
-def get_title_basics(title):
-    with open('DATA/cinema/title.basics.tsv') as f:
-        for line in f:
-            info = line.strip().split('\t')
-            if info[3] == title:
-                return info
-    return None
-
-
-def test_film():
-    title_basics = get_title_basics('Don Juan DeMarco')
+def get_film_rating(title):
+    title_basics = films_reader.get_tt_basics(title)
+    if not title_basics:
+        return None
 
     tconst = title_basics[0]
     genres = title_basics[8].split(',')
 
-    writer_basics = get_title_writer(tconst)
+    writer_basics = films_reader.get_tt_writer(tconst)
+    if not writer_basics:
+        return None
 
-    if writer_basics != None:
-        rate, num_votes = get_title_rating(tconst)
+    rate = films_reader.get_tt_rating(tconst)
 
-    pprint(rate)
-
-
-def main():
-    book_name = "Don Juan (Penguin Classics)"
-    book_rate = get_book_rating(book_name)
-    print(book_rate)
+    return rate
 
 
 def get_book_rating(title):
-    df = pd.read_csv('DATA/library/goodbooks_10k/books.csv')
-    rates = df.average_rating[df['original_title'] == title]
+    gb_rate = books_reader.get_gb_rating(title)
+    bc_rate = books_reader.get_bc_rating(title)
+
+    rates = [rate for rate in [gb_rate, bc_rate]
+             if rate > 0]
+
     if len(rates) > 0:
-        print('GoodBook!')
-        rate = rates.iloc[0]
-        return rate
-
-    df = pd.read_csv('DATA/library/book_crossing/books.csv',
-                     sep=';', escapechar='\\')
-    # "Don Juan (Penguin Classics)";"George Gordon Byron, Baron Byron"
-    isbn = df[df['Book-Title'] == title]['ISBN']
-    if len(isbn) > 0:
-        isbn = isbn.iloc[0]
-    else:
-        return None
-
-    df = pd.read_csv('DATA/library/book_crossing/ratings.csv',
-                     sep=';', escapechar='\\')
-    rates = df[(df['ISBN'] == isbn) & (df['Book-Rating'] > 0)]['Book-Rating']
-    if len(rates) > 0:
-        print('BookCrossing!')
-        rate = (rates.sum() / len(rates)) / 2
-        return rate
-    else:
-        return None
+        return sum(rates) / len(rates)
+    return None
 
 
-def test_book():
-    book_name = "Don Juan (Penguin Classics)"
-    author = 'Lord Byron'
-    book_rate = get_book_rating(book_name)
-    print(book_rate)
+def compare(film_title, book_title):
+    film_rate = get_film_rating(film_title)
+    book_rate = get_book_rating(book_title)
+
+    return (film_rate, book_rate)
+
+
+def test_funcs():
+    film_title = 'Don Juan DeMarco'
+    book_title = 'Don Juan (Penguin Classics)'
+    comp = compare(film_title, book_title)
+    print(
+        f'Film {film_title}: {comp[0]} / 10,\nBook {book_title}: {comp[1]} / 5')
 
 
 if __name__ == '__main__':
     start = time.time()
-    test_film()
+    test_funcs()
     print(time.time() - start)
