@@ -1,19 +1,20 @@
 """Compare ratings for film and book"""
 
-import time
-from pprint import pprint
 import films_reader
 import books_reader
 
 
-def get_film_rating(title):
+def get_film_rating(title: str) -> float:
+    '''
+    Return film rating
+    >>> get_film_rating('Don Juan DeMarco')
+    6.7
+    '''
     title_basics = films_reader.get_tt_basics(title)
     if not title_basics:
         return None
 
     tconst = title_basics[0]
-    genres = title_basics[8].split(',')
-    print(genres)
 
     writer_basics = films_reader.get_tt_writer(tconst)
     if not writer_basics:
@@ -24,7 +25,12 @@ def get_film_rating(title):
     return rate
 
 
-def get_book_rating(title):
+def get_book_rating(title: str) -> float:
+    '''
+    Return book rating
+    >>> get_book_rating('Don Juan (Penguin Classics)')
+    4.5
+    '''
     gb_rate = books_reader.get_gb_rating(title)
     bc_rate = books_reader.get_bc_rating(title)
 
@@ -36,22 +42,20 @@ def get_book_rating(title):
     return None
 
 
-def compare(film_title, book_title):
+def compare(film_title: str, book_title: str) -> tuple:
+    '''
+    Return film and book rating in comparison
+    >>> compare('Don Juan DeMarco', 'Don Juan (Penguin Classics)')
+    (6.7, 4.5)
+    >>> compare('Quick fly', 'Don Juan (Penguin Classics)')
+    (None, 4.5)
+    '''
     film_rate = get_film_rating(film_title)
     book_rate = get_book_rating(book_title)
 
     return (film_rate, book_rate)
 
 
-def test_funcs():
-    film_title = 'Don Juan DeMarco'
-    book_title = 'Don Juan (Penguin Classics)'
-    comp = compare(film_title, book_title)
-    print(
-        f'Film {film_title}: {comp[0]} / 10,\nBook {book_title}: {comp[1]} / 5')
-
-
 if __name__ == '__main__':
-    start = time.time()
-    test_funcs()
-    print(time.time() - start)
+    import doctest
+    doctest.testmod()

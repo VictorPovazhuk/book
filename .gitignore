@@ -6,3 +6,6 @@ tests/**
 temp
 .ipynb_checkpoints/**
 __pycache__/**
+films_analyzer_old.py
+DATA.zip
+test_modules.py

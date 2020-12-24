@@ -55,3 +55,13 @@ def main():
 start_time = time.time()
 main()
 print(time.time() - start_time)
+
+
+# genres = title_basics[8].split(',')
+
+# def get_few_titles():
+#     with open('DATA/cinema/title.basics.tsv') as f:
+#         titles = []
+#         for i in range(10):
+#             titles.append(f.readline())
+#     return titles

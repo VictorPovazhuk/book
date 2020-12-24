@@ -1,35 +1,37 @@
+'''Recommend some books'''
+
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from nltk.tokenize import RegexpTokenizer
+import os
+import books_reader
 
 
-def remove_punctuation(text):
+def remove_punctuation(text: str) -> str:
+    '''
+    Return cleaned string
+    >>> remove_punctuation('Very, long, sentence')
+    'Very long sentence'
+    '''
     tokenizer = RegexpTokenizer(r'\w+')
     text = tokenizer.tokenize(text)
     text = " ".join(text)
     return text
 
 
-def recommend_title(title, genre):
-    df = pd.read_csv('DATA/library/bnb/records.csv')
-
-    # filtrate genre
-    df2 = df[df['Genre'].notnull()]
-
-    # add specified title
-    df3 = pd.DataFrame([[title, genre]], columns=['Title', 'Genre'])
-    df2 = df2.append(df3)
-
-    data = df2[df2['Genre'].str.contains(genre)]
-    print(data)
+def get_recommend_title(df: pd.DataFrame, title: str) -> list:
+    '''
+    Return books recommended by title
+    '''
+    data = df.copy(deep=True)
 
     # create cleaned titles to calculate cosine similarity
-    df2['format_title'] = df2['Title'].str.lower()
-    df2['format_title'] = df2['format_title'].apply(func=remove_punctuation)
-    df2.drop_duplicates(subset='format_title', keep='first', inplace=True)
+    data['format_title'] = data['Title'].str.lower()
+    data['format_title'] = data['format_title'].apply(func=remove_punctuation)
+    data.drop_duplicates(subset='format_title', keep='first', inplace=True)
 
-    # create new indices for interacting in all data frames
+    # create new indices for interacting between dataframe and matrix
     data.reset_index(level=0, inplace=True)
 
     idx = data.index[data['Title'] == title][0]
@@ -49,17 +51,48 @@ def recommend_title(title, genre):
     idx_sim = sorted(idx_sim, key=lambda x: x[1], reverse=True)
     idx_sim = idx_sim[1:6]
 
-    book_indices = [i[0] for i in idx_sim]
-    recommends = data['Title'].iloc[book_indices]
+    recoms = [(data['Title'].iloc[el[0]], el[1]) for el in idx_sim]
 
-    return recommends
+    return recoms
 
 
-def test_funcs():
-    title, genre = 'The Shelley-Byron men : lost angels of a ruined paradise', 'Drama'
-    recs = recommend_title(title, genre)
-    print(list(recs))
+def recommend_books(title: str, genre: str) -> list:
+    '''
+    Return recommended other books
+    >>> recommend_books('Don Juan Demarico', 'Romance')[3] == 'Byron, Don Juan'
+    True
+    >>> recommend_books('The Shelley-Byron men : lost angels of\
+a ruined paradise', 'Biography')[2]
+    'Shelley and Byron in Pisa'
+    '''
+    df = books_reader.load_bnl_books()
+
+    # filtrate titles
+    df = df[df['Title'].notnull()]
+
+    # add specified title
+    df3 = pd.DataFrame([[title, genre]], columns=['Title', 'Genre'])
+    df2 = df.append(df3)
+
+    no_genre_recoms = get_recommend_title(df2, title)
+
+    df2 = df2[df2['Genre'].notnull()]
+    df2 = df2[df2['Genre'].str.contains(genre)]
+    genre_recoms = get_recommend_title(df2, title)
+
+    recoms = []
+    i1 = i2 = 0
+    for _ in range(5):
+        if genre_recoms[i1][1] < 0.15 and no_genre_recoms[i2][1] > 0.1:
+            recoms.append(no_genre_recoms[i2][0])
+            i2 += 1
+        else:
+            recoms.append(genre_recoms[i1][0])
+            i1 += 1
+
+    return recoms
 
 
 if __name__ == '__main__':
-    test_funcs()
+    import doctest
+    doctest.testmod()
