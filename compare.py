@@ -13,6 +13,7 @@ def get_film_rating(title):
 
     tconst = title_basics[0]
     genres = title_basics[8].split(',')
+    print(genres)
 
     writer_basics = films_reader.get_tt_writer(tconst)
     if not writer_basics:

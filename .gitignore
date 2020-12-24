@@ -1,7 +1,8 @@
 # /** matches e-thing in this folder
+allDATA/**
 DATA/**
-aDATA/**
 EXAMPLES/**
+tests/**
 temp
 .ipynb_checkpoints/**
 __pycache__/**

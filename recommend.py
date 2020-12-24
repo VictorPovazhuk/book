@@ -17,12 +17,17 @@ def recommend_title(title, genre):
     # filtrate genre
     df2 = df[df['Genre'].notnull()]
 
+    # add specified title
+    df3 = pd.DataFrame([[title, genre]], columns=['Title', 'Genre'])
+    df2 = df2.append(df3)
+
+    data = df2[df2['Genre'].str.contains(genre)]
+    print(data)
+
     # create cleaned titles to calculate cosine similarity
     df2['format_title'] = df2['Title'].str.lower()
     df2['format_title'] = df2['format_title'].apply(func=remove_punctuation)
     df2.drop_duplicates(subset='format_title', keep='first', inplace=True)
-
-    data = df2[df2['Genre'].str.contains(genre)]
 
     # create new indices for interacting in all data frames
     data.reset_index(level=0, inplace=True)
@@ -51,7 +56,7 @@ def recommend_title(title, genre):
 
 
 def test_funcs():
-    title, genre = 'The Shelley-Byron men : lost angels of a ruined paradise', 'Biography'
+    title, genre = 'The Shelley-Byron men : lost angels of a ruined paradise', 'Drama'
     recs = recommend_title(title, genre)
     print(list(recs))
 
